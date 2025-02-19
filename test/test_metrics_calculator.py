@@ -36,7 +36,7 @@ class TestMetricsCalculator(unittest.TestCase):
         # Test long content with all medical terms
         long_content = "Patient visited doctor for diagnosis of symptoms. Treatment included medication."
         score = self.calculator._calculate_content_score(long_content)
-        self.assertGreater(score, 0.4)  # Modificato da 0.7 a 0.4 per riflettere l'implementazione attuale
+        self.assertGreater(score, 0.4)  # Modified from 0.7 to 0.4 to reflect current implementation
 
     def test_calculate_single_patient_completeness(self):
         """Test completeness calculation for a single patient"""
@@ -65,7 +65,7 @@ class TestMetricsCalculator(unittest.TestCase):
         """Test medical terminology scoring"""
         test_cases = [
             ("Normal text without terms", 0.0),
-            ("Patient had symptoms", 0.06),  # Modificato da 0.12 a 0.06 (un termine = 0.06)
+            ("Patient had symptoms", 0.06),  # Modified from 0.12 to 0.06 (one term = 0.06)
             ("Doctor diagnosed symptoms", 0.12)  # Due termini = 0.12
         ]
         

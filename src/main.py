@@ -25,11 +25,9 @@ def main():
     text_analysis = nlp_analyzer.analyze_chat_summaries(clean_data['chat_summary_per_phase'])
 
     # Calculate metrics
-    print("Calculating completeness metrics...")
     completeness_scores = metrics_calc.calculate_phase_completeness(clean_data)
 
     # Visualize and save results
-    print("Generating visualizations...")
     visualizer.visualize_and_save_results(
         text_analysis['sentiment_per_phase'],
         text_analysis['topics_per_phase'],

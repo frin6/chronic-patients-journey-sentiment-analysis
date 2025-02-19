@@ -6,18 +6,18 @@ from tqdm import tqdm
 PHASE_MAPPING = {
     'early_symptoms_phase': 'symptom_onset',
     'referral_pathway': 'pre_diagnostic',
-    'diagnosis': 'primary_diagnostic',      # torniamo al mapping diretto
-    'treatment': 'new_treatment',           # torniamo al mapping diretto
+    'diagnosis': 'primary_diagnostic',      # return to direct mapping
+    'treatment': 'new_treatment',           # return to direct mapping
     'ongoing_care': 'ongoing_care'
 }
 
 # Additional phase mappings for keyword search
 ADDITIONAL_PHASE_MAPPING = {
-    'diagnosis': ['decision'],              # cerca solo decision come extra
-    'treatment': ['reevaluation']           # cerca solo reevaluation come extra
+    'diagnosis': ['decision'],              # it searches only decision as extra
+    'treatment': ['reevaluation']           # it searches only reevaluation as extra
 }
 
-# Keywords per identificare le fasi
+# Keywords to identify phases
 PHASE_KEYWORDS = {
     'decision': ['decide', 'decision', 'chose', 'choice', 'opt', 'option', 'consider'],
     'reevaluation': ['reevaluation', 'reassess', 'follow-up', 'follow up', 'monitoring', 'review']

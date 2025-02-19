@@ -70,7 +70,7 @@ class TestNLPAnalyzer(unittest.TestCase):
         self.assertIn('sentiment', results)
         self.assertIn('topics', results)
         
-        # Verifichiamo che le fasi non valide abbiano i valori di fallback
+        # Verify that invalid phases have fallback values
         for phase in EXPECTED_PHASES:
             self.assertIn(phase, results['sentiment'])
             self.assertIn(phase, results['topics'])

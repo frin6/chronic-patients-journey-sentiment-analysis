@@ -66,7 +66,7 @@ class DataLoader:
         location_columns = ['latitude', 'longitude']
         for col in location_columns:
             if col in cleaned_df.columns:
-                # Fill with median instead of mean for geographical coordinates
+                # Fill with median for geographical coordinates (ASSUMPTION: Median is a good proxy for the center of the dataset)
                 cleaned_df[col] = cleaned_df[col].fillna(cleaned_df[col].median())
         
         # Handle sparse categorical data
@@ -119,11 +119,6 @@ class DataLoader:
         # Drop irrelevant columns
         columns_to_drop = ['tips', 'documents']
         cleaned_df = cleaned_df.drop(columns=[col for col in columns_to_drop if col in cleaned_df.columns])
-        
-        # Save cleaned dataset to outputs
-        output_path = Path("outputs/cleaned_dataset.csv")
-        cleaned_df.to_csv(output_path, index=False)
-        print(f"\nCleaned dataset saved to {output_path}")
         
         return cleaned_df
     

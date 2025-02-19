@@ -81,10 +81,11 @@ Uses zero-shot classification for topics:
    - Classify topics in content
    - Extract additional phases
 
-4. **Visualization**
+4. **Visualizations and Outputs**
    - Generate heatmaps for sentiment
    - Create topic distribution visualizations
    - Plot completeness scores
+   - Generate a textual summary report 
 
 ## Limitations and Considerations
 
@@ -109,11 +110,13 @@ Uses zero-shot classification for topics:
    - Implement contextual analysis instead of simple keyword matching
    - Train a custom classifier for phase detection
    - Fine-tune sentiment model on medical domain text
+   - Use other data categories from the dataset to improve phase detection (for example, the time to the first visit or the presence of comorbidities)
 
 2. **Topic Analysis Enhancement**
    - Add medical-specific topics based on domain expertise
    - Implement hierarchical topic modeling
    - Consider temporal relationships between topics across phases
+   - Use other data categories from the dataset to gain more insights (for example, the correlation between the sentiment and the age, the profession or the biological sex of the patient)
 
 3. **Performance Optimization**
    - Implement distributed processing for large datasets

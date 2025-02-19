@@ -86,10 +86,10 @@ class ResultsVisualizer:
             fill_value=0.0
         )
         
-        # Riordina le fasi secondo l'ordine delle fasi principali
+        # Reorder by main phases order
         sentiment_pivot = sentiment_pivot.reindex(main_phases)
         
-        # Usiamo una colormap che mostri meglio le sfumature
+        # Use a colormap that shows better shades
         sns.heatmap(
             sentiment_pivot, 
             annot=True, 
@@ -132,10 +132,10 @@ class ResultsVisualizer:
             aggfunc='mean'
         )
         
-        # Riordina le fasi secondo EXPECTED_PHASES principali
+        # Reorder by main phases
         topic_pivot = topic_pivot.reindex(main_phases)
         
-        # Migliorare la leggibilità delle etichette
+        # Improve readability of labels
         sns.heatmap(
             topic_pivot, 
             annot=True, 
@@ -145,7 +145,7 @@ class ResultsVisualizer:
         )
         
         plt.title('Topic Distribution by Phase', pad=20)
-        plt.xticks(rotation=0)  # Etichette orizzontali
+        plt.xticks(rotation=0)
         plt.yticks(rotation=0)
         
         plt.tight_layout()
@@ -156,7 +156,7 @@ class ResultsVisualizer:
         """Create completeness scores visualization"""
         plt.figure(figsize=(10, 6))
         
-        # Riordina secondo EXPECTED_PHASES
+        # Reorder by EXPECTED_PHASES
         ordered_phases = [p for p in EXPECTED_PHASES if p in completeness_results['phase_completeness']]
         scores = [completeness_results['phase_completeness'][p] for p in ordered_phases]
         
