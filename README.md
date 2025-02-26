@@ -157,7 +157,4 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Find outputs in `results/` directory:
-   - Sentiment heatmaps: `results/heatmaps/`
-   - Topic distributions: `results/topics/`
-   - Completeness scores: `results/completeness/`
+4. Find outputs in `results/` directory
