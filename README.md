@@ -1,151 +1,163 @@
-# **Data Science Challenge Repository**
+# Patient Journey Analysis Documentation
 
-Welcome to the **Data Science Challenge Repository**! This repository is designed to assess candidates’ skills in handling messy, real-world healthcare data, building robust data pipelines, and deriving actionable insights. Below, you’ll find all the resources and instructions needed to complete the challenge.
+## System Overview
+This system analyzes patient journey data to extract insights about the completeness, sentiment, and topics discussed in each phase of the medical journey. The data is extracted from a dataset of patient journey stories, which can't be shared publicly.
 
----
+## Core Components
 
-## **Repository Structure**
-```plaintext
-repository_root/
-├── src/        # Python source code
-├── test/       # Unit tests
-├── data/       # Provided dataset (challenge-specific)
-├── outputs/    # Optional: Processed data or generated outputs
-└── README.md   # Documentation (this file)
+### 1. Data Structure
+- Patient journeys are divided into chronological phases
+- Each phase contains text descriptions of patient experiences
+- Raw data phases:
+  - early_symptoms_phase
+  - referral_pathway
+  - diagnosis
+  - treatment
+  - ongoing_care
+  - documents
+  - tips
+  - confounding_factors
+
+### 2. Phase Mapping
+We map raw data phases to standardized phases for analysis:
+```python
+PHASE_MAPPING = {
+    'early_symptoms_phase': 'symptom_onset',
+    'referral_pathway': 'pre_diagnostic',
+    'diagnosis': 'primary_diagnostic',
+    'treatment': 'new_treatment',
+    'ongoing_care': 'ongoing_care'
+}
 ```
 
-- **`src/`**: Place your Python scripts here. Ensure your code is modular, well-documented, and production-ready.
-- **`test/`**: Include unit tests covering data cleaning, NLP models, and metrics calculations.
-- **`data/`**: Contains the provided dataset. Delete this folder after the challenge as it contains synthetic data modeled after real healthcare scenarios.
-- **`outputs/`**: *(Optional)* Store processed data or metrics outputs in this directory.
-
----
-
-## **Dataset Overview**
-The dataset, located in the `data/` directory, is synthetically generated to mimic real-world patient journey scenarios. It includes both structured and unstructured data and is designed to reflect common challenges in healthcare analytics.
-
-### **Key Features**
-- **Structured Data**: Includes fields such as `biological_sex`, `age_range`, `profession`, `country`, as well as numerical fields like `time_to_diagnosis`, `time_to_first_visit`, and `patient_expenses`.
-- **Unstructured Text Data**: The `chat_summary_per_phase` field contains JSON-like objects summarizing patient conversations across different journey phases. Note that the `tips` and `documents` keys should be discarded, as they are irrelevant to the challenge.
-
-### **Challenges**
-- **Missing Values**: Fields like `location` and `gender` may be incomplete.
-- **Inconsistent Formats**: Fields (e.g., dates, numerical ranges) may appear in varied formats or contain errors.
-- **Partial Data**: The `chat_summary_per_phase` field may have incomplete or missing summaries for certain phases.
-- **Heterogeneous Values**: Demographic fields (e.g., `biological_sex`, `occupation`) may have inconsistent representations for the same values.
-
----
-
-## **Patient Journey Overview**
-The patient journey captures the stages of care from symptom onset to recovery or long-term management. This challenge uses automated interview data, structured into the following key phases:
-
-1. **Symptom Onset**: Initial symptoms appear.
-2. **Pre-Diagnostic Phase**: Consultations and preliminary tests occur.
-3. **Primary Diagnostic Phase**: Tests confirm a diagnosis.
-4. **Decision Phase**: Treatment plans are established.
-5. **New Treatment Phase**: Treatment begins, and progress is monitored.
-6. **Ongoing Care Phase**: Long-term management of chronic conditions.
-7. **Reevaluation Phase**: Periodic reassessment of treatments.
-
-Each phase may have a corresponding summary in the `chat_summary_per_phase` field. Analyzing interrelationships across phases adds complexity to the challenge.
-
----
-
-## **Objectives of the Challenge**
-
-### 1. **Data Cleaning and Normalization**
-- Normalize date formats.
-- Handle missing demographic fields (e.g., `biological_sex`, `age_range`).
-- Extract and process the `chat_summary_per_phase` field for patient journey analysis.
-
-### 2. **NLP Analysis**
-- **Topic Extraction**: Use a zero-shot classification model for text classification. Perform statistical analyses where relevant.
-- **Sentiment Analysis**: Apply a pre-trained sentiment model to assess sentiment across phases. Conduct statistical analyses where applicable.
-- **Patient Journey Overview**: 
-  •	Objective: Represent the patient journey as a comprehensive, aggregated pathway that captures key milestones, challenges, and overall progress. The representation should balance a high-level overview with detailed insights into each phase. Here a few examples, but not limited to:
-	-	**Phase-Based Aggregated Metrics**:
-		-	Use visualizations like heatmaps or stacked bar charts to present aggregated metrics for each phase.
-		-	Example Metrics:
-			-	Average sentiment.
-			-	Commonly discussed topics.
-		-	Example:
-			-	A heatmap showing sentiment intensity across phases to identify where patients encounter the most significant challenges.
-	-	**Text Summary**:
-		-	Generate a concise textual overview of the aggregated journey to highlight critical patterns and insights.
-			-	Example 1: “Most patients experience a delay of X days between symptom onset and diagnosis.”
-			-	Example 2: “The decision phase frequently correlates with negative sentiment due to treatment uncertainties.”
-- **Partial Conversations** *(Optional)*: Handle incomplete summaries by assigning fallback labels or calculating a “Completeness Score.”
-
-### 3. **Metrics Development**
-- **Phase Completeness Score** *(Optional)*: Quantify the completeness of patient journey phases.
-
-### 4. **Unit Testing and Production-Ready Code**
-- Include robust tests for data cleaning, NLP inference, and metrics.
-- Implement error handling, logging, and scalability best practices.
-
----
-
-## **Evaluation Criteria**
-Your submission will be assessed based on the following:
-
-- **Data Handling**: Effectiveness in cleaning, normalizing, and handling missing data.
-- **NLP and Statistical Analysis**: Accurate and meaningful insights from text and statistical analyses.
-- **Metrics Actionability**: Insights must provide real-world value.
-- **Code Quality**: Ensure modularity, maintainability, and comprehensive documentation.
-- **Testing**: Thorough unit tests with coverage of edge cases.
-
----
-
-## **How to Use This Repository**
-
-### 1. **Clone the Repository**
-```bash
-git clone <repository_url>
-cd <repository_folder>
+Additional phases are extracted through keyword analysis:
+```python
+ADDITIONAL_PHASE_MAPPING = {
+    'diagnosis': ['decision'],
+    'treatment': ['reevaluation']
+}
 ```
 
-### 2. **Install Required Libraries**
-Create a virtual environment and install dependencies:
+### 3. Completeness Analysis
+Completeness score (0.0-1.0) is calculated based on:
+- Content length (70% of score)
+  - Maximum score at 500 characters
+  - Linear scaling below that
+- Medical terminology presence (30% of score)
+  - Each key medical term adds 0.06 to score
+  - Terms: diagnosis, treatment, symptoms, doctor, medication
+
+### 4. Sentiment Analysis
+- Uses transformers sentiment analysis pipeline
+- Three categories: POSITIVE, NEGATIVE, NEUTRAL
+- Fallback to NEUTRAL (0.5) when analysis fails
+- Sentiment scores are not normalized to preserve intensity
+
+### 5. Topic Analysis
+Uses zero-shot classification for topics:
+- symptoms
+- diagnosis
+- treatment
+- medication
+- side effects
+- doctor visits
+- emotional state
+- daily life impact
+
+## Processing Flow
+
+1. **Data Loading**
+   - Load raw patient journey data
+   - Clean and structure the data
+   - Map to standardized phases
+
+2. **Completeness Analysis**
+   - Calculate base scores from content length
+   - Add bonus for medical terminology
+   - Weight scores by phase importance
+
+3. **Text Analysis**
+   - Analyze sentiment per phase
+   - Classify topics in content
+   - Extract additional phases
+
+4. **Visualizations and Outputs**
+   - Generate heatmaps for sentiment
+   - Create topic distribution visualizations
+   - Plot completeness scores
+   - Generate a textual summary report 
+
+## Limitations and Considerations
+
+1. **Data Quality**
+   - Missing phases affect overall analysis
+   - Text quality impacts sentiment accuracy
+   - Language model limitations
+
+2. **Phase Detection**
+   - Keyword-based detection may miss context
+   - Some phases may overlap
+   - Additional phases may be less reliable
+
+3. **Performance**
+   - NLP operations are computationally intensive
+   - Batch size affects memory usage
+   - Caching helps but has memory implications 
+
+## Possible Improvements
+
+1. **Enhanced Phase Detection**
+   - Implement contextual analysis instead of simple keyword matching
+   - Train a custom classifier for phase detection
+   - Fine-tune sentiment model on medical domain text
+   - Use other data categories from the dataset to improve phase detection (for example, the time to the first visit or the presence of comorbidities)
+
+2. **Topic Analysis Enhancement**
+   - Add medical-specific topics based on domain expertise
+   - Implement hierarchical topic modeling
+   - Consider temporal relationships between topics across phases
+   - Use other data categories from the dataset to gain more insights (for example, the correlation between the sentiment and the age, the profession or the biological sex of the patient)
+
+3. **Performance Optimization**
+   - Implement distributed processing for large datasets
+   - Optimize batch sizes based on available hardware
+   - Add incremental processing capabilities
+
+## Setup and Technical Requirements
+
+### Prerequisites
+- Python 3.8+
+- CUDA-compatible GPU recommended for faster processing
+
+### Tech Stack
+- **Core Processing**: Python
+- **ML/NLP Libraries**:
+  - transformers==4.30.0
+  - torch==2.0.0
+  - numpy==1.24.0
+  - pandas==2.0.0
+- **Visualization**:
+  - matplotlib==3.7.0
+  - seaborn==0.12.0
+
+### Installation
+1. Clone the repository:
 ```bash
-python3 -m venv venv
-source venv/bin/activate  # Linux/Mac
-venv\Scripts\activate     # Windows
+git clone https://github.com/frin6/chronic-patients-journey-sentiment-analysis
+cd patient-journey-analysis
+```
+2. Create and activate a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+
+3. Install dependencies:
+```bash
 pip install -r requirements.txt
 ```
 
-### 3. **Run Your Code**
-Place your scripts in the `src/` directory and execute them from the repository root:
-```bash
-python src/your_script.py
-```
-
-### 4. **Run Unit Tests**
-Include your tests in the `test/` directory and run them with:
-```bash
-pytest test/
-```
-
-### 5. **Save Output Results**
-Store any outputs (e.g., metrics CSV, processed datasets) in the `outputs/` folder.
-
----
-
-## **Deliverables**
-1. **Code**: All Python scripts should be in the `src/` directory, structured for modularity and readability.
-2. **Tests**: Include detailed unit tests in the `test/` directory.
-3. **Documentation**: Add comments/docstrings explaining assumptions and logic. Update this README as needed.
-4. **Metrics**: Save results in a structured format (e.g., CSV, JSON).
-
----
-
-## **Important Notes**
-- **Data Deletion Policy**: The dataset in `data/` must be deleted after the challenge.
-- **Licensing and Usage**: This repository and its contents are for challenge use only. Redistribution or reuse is prohibited.
-
----
-
-## **Contact**
-For questions or technical issues, reach out to:
-
-- **Name**: Lorenzo Famiglini  
-- **Email**: lorenzo.famiglini@mamahealth.com
+4. Find outputs in `results/` directory:
+   - Sentiment heatmaps: `results/heatmaps/`
+   - Topic distributions: `results/topics/`
+   - Completeness scores: `results/completeness/`
